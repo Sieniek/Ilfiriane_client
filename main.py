@@ -11,8 +11,8 @@ import random
 
 MAX_V = 7
 SOCKET = 32512
-SERVER_IP = '192.168.10.20'
-
+SERVER_IP = '127.0.0.1'
+PORT = 12345
 size = width, height = 800, 600
 data = []
 class Player:
@@ -74,6 +74,18 @@ def colision(player, enemy):
             enemy.volume -= diferrence
 
 if __name__ == '__main__':
+
+    if len(sys.argv) > 2:
+        SERVER_IP = sys.argv[1]
+        PORT = sys.argv[2]
+    else:
+        print("No valid arguments found, Proper arguments looks like: IP PORT")
+
+    print("IP= " + str(SERVER_IP) + " PORT: " + str(PORT))
+
+    SERVER_IP = "192.168.0.10"
+    PORT = 16696
+
     init()
     random.seed(Clock())
     client_id = random.randint(1,1000)
@@ -91,7 +103,10 @@ if __name__ == '__main__':
         display.flip()
 
         from_server = socket(AF_INET, SOCK_STREAM)
-        from_server.connect(("127.0.0.1", 1234))
+        try:
+            from_server.connect((SERVER_IP, int(float(PORT))))
+        except:
+            pass
         a = from_server.recv(10)
         a = a[:9]
 
@@ -126,9 +141,12 @@ if __name__ == '__main__':
     while 1:#player or opponent r < 1 go to last while with result
 
         from_server = socket(AF_INET, SOCK_STREAM)
-        from_server.connect(("127.0.0.1", 1234))
         try:
-            a = from_server.recv(72*5*8).split(' ')[1:-2]
+            from_server.connect((SERVER_IP, int(float(PORT))))
+        except:
+            pass
+        try:
+            a = from_server.recv(71*5*8).split(' ')[1:-2]
         except:
             print("Server is down. Please, try later.")
 
